@@ -1,0 +1,203 @@
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #e7f2ef;
+  background-image: url('data:image/svg+xml,<svg height="50" width="200" xmlns="http://www.w3.org/2000/svg"><polyline points="0,50 50,10 100,50 150,10 200,50 250,10 300,50 350,10 400,50" fill="none" stroke="%23A1C2BD" stroke-opacity="0.4" stroke-width="10"/></svg>');
+  background-size: 50px 25px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.input-container {
+  /* display: flex; */
+  /* position: relative; */
+  margin: 0.5rem;
+  justify-self: center;
+}
+
+.main {
+  display: block;
+  position: relative;
+  margin: 3rem;
+  padding: 10px;
+  border-radius: 20px;
+  background-color: rgba(112, 137, 147, 0.4);
+}
+
+.guess {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+
+#input {
+  border-radius: 20px;
+  padding: 1rem;
+  margin: 0.25rem;
+}
+
+#input:disabled {
+  background-color: rgba(211, 211, 211, 0.5);
+}
+
+.game-info {
+  display: grid;
+  grid-template-columns: .25fr 1fr .25fr;
+}
+
+#timer {
+  grid-area: 1/1/2/2;
+  display: inline-flex;
+  gap: 5px;
+}
+
+#level-up {
+  display: none;
+}
+
+.debug {
+  display: none;
+}
+
+#level-score {
+  height: fit-content;
+  background-color: #474f7a;
+  padding: 10px;
+  border-radius: 5px;
+  color: aliceblue;
+  width: fit-content;
+  align-content: center;
+  grid-area: 1/3/2/4;
+  font-size: .9em;
+}
+
+.starter {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+}
+
+.tile-container {
+  grid-area: 1/2/2/3;
+  height: 80px;
+  align-items: center;
+  position: relative;
+}
+
+.tile {
+  display: flex;
+  width: 80px;
+  height: 80px;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: #474f7a;
+  color: seashell;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  padding: 1.5rem;
+  box-sizing: border-box;
+  border-radius: 10px;
+  transition: transform 1s ease-in-out;
+  text-transform: uppercase;
+}
+
+.blanks {
+  display: grid;
+  grid-template-rows: repeat(10, auto);
+  grid-auto-flow: column;
+  padding: 1.5rem;
+  margin: 2rem;
+  gap: 3px;
+  border-radius: 10px;
+  justify-content: space-around;
+  background-color: rgba(255,255,255, 0.2)
+}
+
+
+.letters {
+  font-size: x-large;
+  text-transform: uppercase;
+  color: #474f7a
+}
+
+.btn2 {
+  font-family: 'Roboto';
+  cursor: pointer;
+  position: relative;
+  padding: 8px 32px;
+  border: none;
+  border-radius: 28px;
+  background: #474f7a;
+  overflow: hidden;
+  color: white;
+  transition: 0.3s all;
+}
+
+.btn2:hover {
+  background-color: #535c91;
+}
+
+.btn2::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0)
+  );
+  transform: skewX(-20deg);
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 150%; /* Move the shimmer completely across and past the button */
+  }
+}
+
+.btn {
+  font-family: 'Roboto';
+  position: relative;
+  background-color: #474f7a;
+  border-radius: 28px;
+  padding: 16px 31px;
+  border: 1px solid #708993;
+  cursor: pointer;
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.btn:hover {
+  background-color: #535c91;
+}
+
+.btn:active {
+  position: relative;
+  top: 1px;
+}
+
+.btn#start::before{
+ content: '';
+ position: absolute;
+ top: 0;
+ left: -100%;
+ width: 50%;
+ height: 100%;
+}
+
+.btn#start:hover::before {
+  background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.4), rgba(255,255,255,0));
+  transform: skewX(-20deg);
+  animation: shimmer 1.5s infinite linear;
+}

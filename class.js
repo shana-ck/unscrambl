@@ -1,0 +1,301 @@
+import words from './sanitized.json' with {type: 'json'}
+
+const shufButton = document.getElementById('shuffle')
+const start = document.getElementById('start')
+const input = document.getElementById('input')
+const form = document.getElementById('guess')
+const display = document.getElementById('countdown')
+const levelBtn = document.getElementById('level-up')
+const container = document.querySelector('.input-container')
+const debugContainer = document.querySelector('.debug')
+let count = 0
+
+let intervalId
+
+class InputHandler {
+    constructor(game) {
+        this.game = game
+        shufButton.addEventListener('click', () => this.game.shuffleTiles())
+            form.addEventListener('submit', (e) => {
+            e.preventDefault()
+            if (!input.disabled){
+            this.game.check()
+            input.value = ""
+        } else if (input.disabled) {
+            form.addEventListener('click', () => count +=1)
+            if (count >=3) {
+                this.game.debug()
+            }
+        }
+        })
+        levelBtn.addEventListener('click', () => this.game.levelUp())
+    }
+}
+
+class WordSet {
+    constructor(game, words) {
+        this.game = game
+        this.words = words
+        this.word = ""
+        this.wordSet = {}
+        this.sorted = {}
+        this.weights = []
+        this.wordLengths = []
+        this.maxWeight = 10
+        this.letters = []
+        this.numTiles = 0
+    }
+    getRandomWord() {
+    const keys = Object.keys(this.words)
+    const randIndex = Math.floor(Math.random() * keys.length)
+    this.word = keys[randIndex]
+    this.letters = Array.from(this.word)
+    this.wordSet = words[this.word]
+    console.log(this.wordSet)
+    delete this.words.word
+    this.sortByLength()
+    this.scoreWeights()
+    this.shuffle(this.letters)
+    }
+    sortByLength() {
+        this.wordSet.forEach(word => {
+            const len = word.length
+            if (!this.sorted[len]) {
+                this.sorted[len] = []
+            }
+            this.sorted[len].push(word)
+        })
+        this.wordLengths = Object.keys(this.sorted)
+    }
+    scoreWeights() {
+        let count = this.wordLengths.length
+        this.weights = this.wordLengths.map((index) => {
+            let weight = Math.abs(Math.floor(this.maxWeight*(1-index/count)))
+            if (weight < 1) {
+                weight = 1
+            }
+            return weight
+        })
+    }
+    shuffle(letters) {
+        this.letters = letters
+        this.numTiles = this.letters.length
+        let curIdx = this.letters.length, randomIndex
+        while (curIdx !== 0) {
+        // pick an element
+        randomIndex = Math.floor(Math.random() * curIdx);
+        curIdx--;
+
+        // swap it with the current element
+        [this.letters[curIdx], this.letters[randomIndex]] = [
+            this.letters[randomIndex], this.letters[curIdx]];
+    }
+}
+}
+
+class Game {
+    constructor(words) {
+        this.words = words
+        this.inputHandler = new InputHandler(this)
+        this.wordData = null
+        this.running = false
+        this.curWord = ""
+        this.found = null
+        this.scoreVal = 0
+        this.maxScore = 0
+        this.level = 1
+        this.timeLimit = 10
+        this.time = 
+        this.lastTime = 0
+        this.gameOver = false;
+        this.wordsFound = []
+        this.container = document.querySelector('.tile-container')
+        this.blanks = document.querySelector('.blanks')
+        this.levelDisplay = document.getElementById('level')
+        this.score = document.getElementById('score')
+        this.input = document.getElementById('input')
+        this.start = document.getElementById('start')
+        this.input.disabled = true
+        this.blanksArray = []
+        this.tiles = []
+    }
+    init() {
+        this.wordData = new WordSet(this, this.words)
+        this.wordData.getRandomWord()
+        this.curWord = this.wordData.word
+        console.log(this.curWord)
+        delete this.words[this.curWord]
+        this.found = Object.fromEntries(this.wordData.wordLengths.map(word => [word, []]))
+        this.input.disabled = false
+        this.getMaxScore()
+        this.createTiles()
+        this.createBlanks()
+        this.startTimer()
+    }
+    getMaxScore() {
+        let scoreArray = this.wordData.weights
+        let wordLen = this.wordData.wordLengths
+        wordLen.forEach(key => {
+            let numWords = this.wordData.sorted[key].length
+            let weightIdx = wordLen.indexOf(key.toString())
+            this.maxScore += scoreArray[weightIdx] * numWords
+        })
+        
+    }
+    createTiles() {
+        let letters = this.wordData.letters
+        let numTiles = letters.length
+        for (let i=0; i < numTiles; i++) {
+            const newTile = document.createElement('div')
+            newTile.className = 'tile'
+            newTile.id = letters[i]
+            newTile.textContent = letters[i]
+            const xPos = i * 80
+            newTile.style.transform = `translate(${xPos}px)`
+            newTile.dataset.xPos = xPos
+            this.tiles.push(newTile)
+        }
+        this.tiles.forEach(tile => {
+            this.container.appendChild(tile)
+        })
+    }
+    createBlanks() {
+        let solver = this.wordData.sorted
+        let wordLen = this.wordData.wordLengths
+        wordLen.forEach(key => {
+            let numWords = solver[key].length
+        for (let i = 0; i< numWords; i++) {
+        const blankTile = document.createElement('div')
+        blankTile.className= 'blank-tile'
+        const letterTiles = document.createElement('div')
+        letterTiles.id = `${key}-${i}`
+        letterTiles.className = "letters"
+        blankTile.appendChild(letterTiles)
+        letterTiles.textContent = '□'.repeat(key)
+        this.blanksArray.push(blankTile)
+        this.blanks.appendChild(blankTile)
+        }
+        })
+    }
+    shuffleTiles() {
+        const currentPos = this.tiles.map(tile => tile.dataset.xPos)
+        this.wordData.shuffle(currentPos)
+        const shuffled = this.wordData.letters
+        this.tiles.forEach((tile, index) => {
+            const newPos = shuffled[index]
+            tile.style.transform = `translate(${newPos}px)`
+            tile.dataset.xPos = newPos
+        })
+    }
+    reset() {
+        let blankTiles = document.querySelectorAll('.blank-tile')
+        blankTiles.forEach(blankTile => {
+            blankTile.remove()
+        })
+        let tiles = document.querySelectorAll('.tile')
+        tiles.forEach(tile => {
+            tile.remove()
+        })
+        this.blanksArray = []
+        this.tiles = []
+        this.wordsFound = []
+        this.scoreVal = 0
+        this.score.textContent = 0
+        this.time = 0
+    }
+    levelUp() {
+        this.level += 1
+        this.levelDisplay.textContent = this.level
+        display.textContent = "03:00"
+        levelBtn.style.display = 'none';
+        this.reset()
+        this.init()
+    }
+    check() {
+        let input = document.getElementById('input').value.trim()
+        input = input.toLowerCase()
+        if (this.wordData.wordSet.includes(input) && !this.wordsFound.includes(input)) {
+            let key = input.length
+            this.wordsFound.push(input)
+            this.found[key].push(input)
+            let scoreIdx = this.wordData.wordLengths.indexOf(key.toString())
+            this.scoreVal += this.wordData.weights[scoreIdx]
+            if (key === this.curWord.length) {
+                this.scoreVal += 10
+            }
+            let wordIdx = this.wordData.sorted[key].indexOf(input)
+            let lettersId = `${key}-${wordIdx}`
+            let lettersFound = document.getElementById(lettersId)
+            lettersFound.textContent = input
+            this.score.textContent = this.scoreVal
+            if (this.wordsFound.length === this.wordData.wordSet.length) {
+                this.stopTimer()
+                levelBtn.style.display = 'inline-block'
+            }
+        }
+    }
+    scoreLevel() {
+        if (this.scoreVal >= Math.floor(0.6*this.maxScore)) {
+            display.textContent = "03:00"
+            levelBtn.style.display = 'inline-block'
+            // start.disabled = false
+            // this.levelUp()
+        } else if (this.wordsFound.length >= Math.floor(0.75*this.wordData.wordSet.length)) {
+            console.log("found enough words")
+            display.textContent = "03:00"
+            levelBtn.style.display = 'inline-block'
+        } else {
+            this.gameOver = true
+            console.log(0.6*this.maxScore)
+            console.log(Math.floor(0.75*this.wordData.wordSet.length))
+        }
+    }
+    startTimer() {
+        let timer = 180, min, sec;
+        if (!intervalId) {
+        start.disabled = true
+        this.running = true;
+        intervalId = setInterval(() => {
+            min = parseInt(timer/60, 10)
+            sec = parseInt(timer % 60, 10)
+            min = min < 10 ? "0" + min : min;
+            sec = sec < 10 ? "0" + sec : sec;
+            display.textContent = min + ":" + sec;
+            if (timer % 15 == 0 && timer!= 180) {
+                this.shuffleTiles()
+            }
+            if (timer <= 0) {
+                console.log("time's up")
+                this.stopTimer()
+                this.scoreLevel()
+            }
+            timer--;
+        }, 1000)
+    }
+    }
+    stopTimer() {
+        clearInterval(intervalId)
+        this.running = false
+        input.disabled = true
+        intervalId = null
+    }
+    debug() {
+        debugContainer.style.display = 'inline-block'
+
+    }
+    }
+
+
+window.addEventListener('load', () => {
+    const game = new Game(words)
+
+    start.addEventListener('click', () => {
+
+        //TODO put gameLoop inside here?
+        game.init()
+
+        })
+})
+
+
+

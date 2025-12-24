@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unscrambl</title>
+    <script src="./class.js" type="module"></script>
+    <link href="./styles.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="starter">
+        <div class="tile-container"></div>        
+    </div>
+    <div class="main">
+        <div class="game-info">
+            <div id="timer">
+            
+            <button class="btn" id="start"><span id="countdown">Start</span></button>
+        <button class="btn2" id="level-up">Level Up</button></button></div>
+            <div id="level-score"><label class="label">Level: <span id="level">1</span>
+            <span class="divider">| </span>Score: <span id="score">0</span></label>
+            </div>
+        </div>
+        <div class="debug"><input type="text" id="debug"><button class="btn" id="debugBtn">Debug</button></div>
+        <div class="input-container">
+        <button class="btn" id="shuffle">Shuffle!</button></div>
+        <form class="guess" id="guess">
+        <input id="input" type="text" placeholder="Guess a word" value=""/>
+        <button class="btn" id="guess-btn" type="submit">Guess!</button>
+        </form>
+    <div class="blanks"></div>
+</div>
+</body>
+</html>

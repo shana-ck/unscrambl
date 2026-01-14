@@ -4,25 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unscrambl</title>
-    <script src="./class.js" type="module"></script>
+    <script src="./index.js" type="module"></script>
     <link href="./styles.css" rel="stylesheet"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="starter">
+    <div class="modal">
+<div class="modal-content"><span class="close">&times;</span>
+<div class="gameSettings">
+    <label class="toggle">
+	<input class="toggle-checkbox" type="checkbox" id="debug-toggle">
+	<div class="toggle-switch"></div>
+	<span class="toggle-label">Debug</span>
+</label>
+<div>
+<label for="wordLength">Minimum Word Length: </label>
+<input type="number" id="wordLength" step="1" min="4" max="7" value="5">
+</div>
+<div>
+<label class="toggle">
+    <input class="toggle-checkbox" type="checkbox" id="fake-toggle" checked>
+    <div class="toggle-switch"></div>
+    <span class="toggle-label">Insert Decoy Letter</span>
+</label>
+</div>
+<div>
+<label for="levelDiff">Difficulty Increase Increment: </label>
+<input type="number" id="levelDiff" step="1" value="5" min="0">
+</div>
+<div>
+<label class="toggle">
+    <input class="toggle-checkbox" type="checkbox" id="unknown-toggle" checked>
+    <div class="toggle-switch"></div>
+    <span class="toggle-label">Insert Unknown Letter</span>
+</label>
+</div>
+</div>
+<span>Default: At level 5, the game will increase in difficulty 
+    and begin inserting either an unknown or decoy letter (i.e., one letter will be replaced with a ? 
+    in the tiles or there will be an extra letter tile that is not actually used).
+    At level 10, the game will increase in difficulty again and the minimum word length will be 5 letters. The decoy/unknown letters will also still be in play.
+    At level 15, the game will increase in difficulty again and have <em>both</em> a decoy and unknown letter.
+</span>
+</div>
+</div>
+<div class="nav">
+    <ul class="options">
+        <li id="openModal">Options</li>
+        <li class="label"><span>Level: <span id="level">1</span></li>
+        <div id="level-score">
+            <span class="wrapper">
+                <div class="scorebar"></div>
+            <li>Score: <span id="score">0</span>
+            <span id="threshold"></span></li>
+            <li>Words: <span id="wordsFound">0</span><span id="wordsThreshold"></span>
+            </li></span></div></div>
+
+        
         <div class="tile-container"></div>        
-    </div>
-    <div class="main">
+ <div class="progress">
+
+            <div class="remaining" id="remaining">
+                    <span id="countdown">02:00</span>
+            </div>
+        </div>
+    
+    <div class="main">   
         <div class="game-info">
             <div id="timer">
-            
-            <button class="btn" id="start"><span id="countdown">Start</span></button>
+            <button class="btn" id="start">Start</button>
+            <button class="btn" id="stopBtn">Stop</button>
         <button class="btn2" id="level-up">Level Up</button></button></div>
-            <div id="level-score"><label class="label">Level: <span id="level">1</span>
-            <span class="divider">| </span>Score: <span id="score">0</span></label>
-            </div>
+            
+
         </div>
         <div class="debug"><input type="text" id="debug"><button class="btn" id="debugBtn">Debug</button></div>
         <div class="input-container">
@@ -33,5 +89,6 @@
         </form>
     <div class="blanks"></div>
 </div>
+
 </body>
 </html>

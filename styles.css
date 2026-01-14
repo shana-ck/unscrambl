@@ -1,3 +1,9 @@
+:root {
+  --progress-bar-width: 100px;
+  --progress-bar-height: 100px;
+  --font-size: 0.5rem;
+}
+
 body {
   display: flex;
   flex-direction: column;
@@ -6,11 +12,64 @@ body {
   background-image: url('data:image/svg+xml,<svg height="50" width="200" xmlns="http://www.w3.org/2000/svg"><polyline points="0,50 50,10 100,50 150,10 200,50 250,10 300,50 350,10 400,50" fill="none" stroke="%23A1C2BD" stroke-opacity="0.4" stroke-width="10"/></svg>');
   background-size: 50px 25px;
   font-family: 'Roboto', sans-serif;
+  margin: auto;
+}
+
+.modal {
+  display: none; 
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav {
+  height: 1.25em;
+  background-color: slategray;
+  margin-bottom: 0.25em;
+}
+
+.options {
+  list-style-type: none;
+  display: flex;
+  padding: 0;
+  margin: 0;
+  justify-content: space-around;
+}
+
+.options > li {
+  color: aliceblue;
+  font-size: small;
 }
 
 .input-container {
-  /* display: flex; */
-  /* position: relative; */
   margin: 0.5rem;
   justify-self: center;
 }
@@ -18,7 +77,7 @@ body {
 .main {
   display: block;
   position: relative;
-  margin: 3rem;
+  margin: 1.5rem;
   padding: 10px;
   border-radius: 20px;
   background-color: rgba(112, 137, 147, 0.4);
@@ -28,6 +87,37 @@ body {
   display: flex;
   align-content: center;
   justify-content: center;
+}
+
+.progress {
+  width: 500px;
+  overflow: hidden;
+  background-color: #474f7a;
+  margin: auto;
+  display: flex;
+  border-radius: 10px;
+}
+
+#remaining {
+  width: 100%;
+  height: 1rem;
+  border-radius: 10px;
+  background-color: #708993;
+  place-items: center;
+  transition: width 1s ease-in-out;
+  animation-timing-function: ease;
+}
+
+#countdown {
+  width: 50px;
+  font-size: 0.75rem;
+  margin-left: 20px;
+  color: aliceblue;
+  justify-content: right;
+  text-align: center;
+
+  display: flex;
+
 }
 
 #input {
@@ -43,6 +133,7 @@ body {
 .game-info {
   display: grid;
   grid-template-columns: .25fr 1fr .25fr;
+  place-items: center;
 }
 
 #timer {
@@ -55,44 +146,97 @@ body {
   display: none;
 }
 
+#stopBtn {
+  display: none;
+}
+
 .debug {
   display: none;
 }
 
-#level-score {
+.level {
   height: fit-content;
   background-color: #474f7a;
-  padding: 10px;
+  padding: 5px;
+  margin: .5rem;
   border-radius: 5px;
   color: aliceblue;
   width: fit-content;
-  align-content: center;
-  grid-area: 1/3/2/4;
-  font-size: .9em;
+  align-self: center;
+  justify-content: center;
+  grid-area: 1/2/2/3;
+  display: grid;
 }
+
+#level-score {
+  list-style-type: none;
+  display: flex;
+  height: 1.25em;
+  color: aliceblue;
+  width: 200px;
+  font-size: small;
+  justify-content: space-around;
+  overflow: hidden;
+  position: relative;
+  background-clip: text;
+}
+
+
+.wrapper {
+  /* width: 200px; */
+  display: flex;
+}
+
+#level-score > .wrapper > li {
+  margin-right: 5px;
+}
+
+.shimmer {
+position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Create the gradient: transparent -> light-gray -> transparent */
+    background: linear-gradient(to right, 
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.8) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    /* Start the gradient far left, outside the visible area */
+    transform: translateX(-100%); 
+    /* Apply the animation */
+    animation: shimmer 1.5s linear;
+    animation-iteration-count: 2;
+}
+
 
 .starter {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 25% 50% 25%;
   grid-template-rows: 1fr;
   grid-column-gap: 0px;
   grid-row-gap: 0px;
+  place-items: center;
 }
 
 .tile-container {
-  grid-area: 1/2/2/3;
   height: 80px;
-  align-items: center;
+  display: flex;
+  margin: auto;
+  padding-bottom: 1rem;
+  /* grid-area: 1/1/2/2; */
   position: relative;
 }
 
 .tile {
-  display: flex;
   width: 80px;
   height: 80px;
   position: absolute;
-  align-items: center;
-  justify-content: center;
+  /* align-items: center; */
+  /* justify-content: center; */
+  text-align: center;
+  align-content: center;
   padding: 1rem;
   background-color: #474f7a;
   color: seashell;
@@ -102,14 +246,15 @@ body {
   border-radius: 10px;
   transition: transform 1s ease-in-out;
   text-transform: uppercase;
+  /* display: grid; */
 }
 
 .blanks {
   display: grid;
   grid-template-rows: repeat(10, auto);
   grid-auto-flow: column;
-  padding: 1.5rem;
-  margin: 2rem;
+  padding: 1rem;
+  margin: 1rem;
   gap: 3px;
   border-radius: 10px;
   justify-content: space-around;
@@ -123,6 +268,24 @@ body {
   color: #474f7a
 }
 
+.letters.pulse-text {
+  animation: pulse 2s;
+  animation-iteration-count: 1;
+  display: inline-block;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1)
+  }
+  50% {
+    transform: scale(1.25)
+  }
+  100% {
+    transform: scale(1)
+  }
+}
+
 .btn2 {
   font-family: 'Roboto';
   cursor: pointer;
@@ -133,6 +296,7 @@ body {
   background: #474f7a;
   overflow: hidden;
   color: white;
+  height: fit-content;
   transition: 0.3s all;
 }
 
@@ -166,6 +330,14 @@ body {
   }
 }
 
+.label {
+  background-color: #474f7a;
+  border-radius: 2px;
+  padding: 1px;
+  color: aliceblue;
+  font-family: 'Roboto';
+}
+
 .btn {
   font-family: 'Roboto';
   position: relative;
@@ -176,6 +348,7 @@ body {
   cursor: pointer;
   color: #ffffff;
   overflow: hidden;
+  height: fit-content;
 }
 
 .btn:hover {
@@ -200,4 +373,64 @@ body {
   background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.4), rgba(255,255,255,0));
   transform: skewX(-20deg);
   animation: shimmer 1.5s infinite linear;
+}
+
+
+.toggle {
+	cursor: pointer;
+	display: inline-block;
+}
+.toggle-switch {
+	display: inline-block;
+	background: #ccc;
+	border-radius: 16px;
+	width: 58px;
+	height: 32px;
+	position: relative;
+	vertical-align: middle;
+	transition: background 0.25s;
+	&:before,
+	&:after {
+		content: "";
+	}
+	&:before {
+		display: block;
+		background: linear-gradient(to bottom, #fff 0%,#eee 100%);
+		border-radius: 50%;
+		box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
+		width: 24px;
+		height: 24px;
+		position: absolute;
+		top: 4px;
+		left: 4px;
+		transition: left 0.25s;
+	}
+	.toggle:hover &:before {
+		background: linear-gradient(to bottom, #fff 0%,#fff 100%);
+		box-shadow: 0 0 0 1px rgba(0,0,0,0.5);
+	}
+	.toggle-checkbox:checked + & {
+		background: green;
+		&:before {
+			left: 30px;
+		}
+	}
+}
+.toggle-checkbox {
+	position: absolute;
+	visibility: hidden;
+}
+.toggle-label {
+	margin-left: 5px;
+	position: relative;
+	top: 2px;
+}
+
+.gameSettings {
+  display: grid;
+grid-template-columns: repeat(2, 1fr);
+grid-template-rows: repeat(5, 1fr);
+grid-column-gap: 0px;
+grid-row-gap: 5px;
+
 }

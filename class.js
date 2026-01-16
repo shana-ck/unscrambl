@@ -19,6 +19,7 @@ const fakeToggle = document.getElementById("fake-toggle")
 const unknownToggle = document.getElementById("unknown-toggle")
 const diffStep = document.getElementById('levelDiff')
 const minLetters = document.getElementById('wordLength')
+const warning = document.getElementById('warning')
 const LETTERS = 'abcdefghijklmnopqrstuvwxyz'.split('')
 const NO_Q = 'abcdefghijklmnoprstuvwxyz'.split('')
 let count = 0
@@ -80,22 +81,37 @@ class WordSet {
         this.maxWeight = 10
         this.letters = []
         this.numTiles = 0
-        // this.getWordsByLevel()
+        this.getWordsByLevel()
     }
-    // getWordsByLevel() {
-    //     const first = this.words.filter(word => word.difficulty === 1)
-    //     const second = this.words.filter(word => word.difficulty === 2)
-    //     this.wordsByLevel[1] = first
-    //     this.wordsByLevel[2] = second
-    // }
+    getWordsByLevel() {
+        const first = this.words.filter(word => word.key.length <= 12)
+        const second = this.words.filter(word => word.key.length <= 25)
+        this.wordsByLevel[1] = first
+        this.wordsByLevel[2] = second
+        let third = []
+  
+        // const cut = this.wordsByLevel[2].filter(word => word.words.length >= this.game.minLength)
+        // const third = cut.filter(word => word.words.length >=10)
+        // this.wordsByLevel[3] = third
+        // console.log(cut)
+    }
 
     getRandomWord(difficulty) {
-    const keys = this.words.map(word => word.key)
+    let keys = this.words.map(word => word.key)
+    if (difficulty <= 2) {
+        keys = keys.filter(key => key.length < 10)
+    }
+    console.log(keys)
     const randIndex = Math.floor(Math.random() * keys.length)
     this.word = keys[randIndex]
     this.letters = Array.from(this.word)
     this.wordInfo = this.words.find(word => word.key === this.word)
+
+    if (difficulty > 2) {
     this.wordSet = this.wordInfo["words"].filter(word => word.length >= this.game.minLength)
+    } else {
+        this.wordSet = this.wordInfo["words"]
+    }
     if (this.game.debugOn) {
             console.log(this.wordSet)
         }
@@ -142,7 +158,6 @@ class WordSet {
         // pick an element
         randomIndex = Math.floor(Math.random() * curIdx);
         curIdx--;
-
         // swap it with the current element
         [this.letters[curIdx], this.letters[randomIndex]] = [
             this.letters[randomIndex], this.letters[curIdx]];
@@ -157,6 +172,7 @@ class Game {
         this.wordData = null
         this.running = false
         this.curWord = ""
+        this.letters = null
         this.found = null
         this.scoreVal = 0
         this.maxScore = 0
@@ -181,7 +197,9 @@ class Game {
         this.decoy = true
         this.unknown = true
         this.diffStep = 5
-        this.minLength = 4
+        this.minLength = 5
+        this.randIndex = -1
+        this.randLetter = ''
     }
     init() {
         this.wordData = new WordSet(this, this.words)
@@ -216,6 +234,7 @@ class Game {
     }
     createTiles() {
         let letters = this.wordData.letters
+        this.letters = letters
         let numTiles = letters.length
         let confuse = ['decoy', 'unknown']
         let chosen
@@ -243,31 +262,39 @@ class Game {
         this.container.style.width = 80*numTiles + 'px'
         if (chosen == 'both') {
             randIndex = Math.floor(Math.random()*letters.length)
+            this.randIndex = randIndex
             if (letters.includes('u')) {
                 randLetter = LETTERS[Math.floor(Math.random()*LETTERS.length)]
+                this.randLetter = randLetter
             } else {
                 randLetter = NO_Q[Math.floor(Math.random()*NO_Q.length)]
+                this.randLetter = randLetter
             }
             letters.push(randLetter)
             numTiles +=1
+            warning.textContent = "Guess the mystery letter and one of the letters is a decoy!"
         } else if (chosen == 'unknown') {
             randIndex = Math.floor(Math.random()*letters.length)
+            this.randIndex = randIndex
+            warning.textContent = "Guess the mystery letter!"
         } else if (chosen == 'decoy') {
              if (letters.includes('u')) {
                 randLetter = LETTERS[Math.floor(Math.random()*LETTERS.length)]
+                this.randLetter = randLetter
             } else {
                 randLetter = NO_Q[Math.floor(Math.random()*NO_Q.length)]
+                this.randLetter = randLetter
             }
             letters.push(randLetter)
             numTiles +=1
-            console.log(letters)
+            warning.textContent = "One of the letters is a decoy!"
         }
         for (let i=0; i < numTiles; i++) {
             const newTile = document.createElement('div')
             newTile.className = 'tile'
             newTile.id = i
             newTile.textContent = letters[i]
-            if (chosen === 'both' || chosen==='unknown') {
+            if (chosen==='unknown' || chosen ==='both') {
                 if (i === randIndex) {
                     newTile.textContent = '?'
                 }
@@ -327,11 +354,16 @@ class Game {
         this.score.textContent = 0
         this.wordsScore.textContent = 0
         this.time = 0
+        this.randIndex = -1
+        this.randLetter = ''
+        warning.textContent = ""
     }
     levelUp() {
         this.level += 1
-        if (this.level >= 10) {
-            this.difficulty =2
+        if (!this.diffStep == 0 || this.difficulty !=4){ 
+            if (this.level % this.diffStep == 0) {
+            this.difficulty +=1
+            }
         }
         this.levelDisplay.textContent = this.level
         display.textContent = "02:00"
@@ -403,6 +435,15 @@ class Game {
             remaining.style.width = percentage + '%'
             if (timer % 15 == 0 && timer!= 120) {
                 this.shuffleTiles()
+            }
+            if (timer == 45 && (this.decoy || this.unknown)) {
+                if (!this.randLetter == '') {
+                    this.tiles.at(-1).classList.add("decoy")
+                }
+                if (this.randIndex !=-1) {
+                    this.tiles[this.randIndex].textContent = this.letters[this.randIndex]
+                    this.tiles[this.randIndex].classList.add('reveal')
+                }
             }
             if (timer <= 0) {
                 if (this.debugOn) {

@@ -434,3 +434,11 @@ grid-column-gap: 0px;
 grid-row-gap: 5px;
 
 }
+
+.decoy {
+  background-color: palevioletred;
+}
+
+.reveal {
+  background-color: lightblue;
+}

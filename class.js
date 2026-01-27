@@ -81,27 +81,33 @@ class WordSet {
         this.maxWeight = 10
         this.letters = []
         this.numTiles = 0
-        this.getWordsByLevel()
     }
     getWordsByLevel() {
-        const first = this.words.filter(word => word.key.length <= 12)
-        const second = this.words.filter(word => word.key.length <= 25)
-        this.wordsByLevel[1] = first
-        this.wordsByLevel[2] = second
-        let third = []
-  
-        // const cut = this.wordsByLevel[2].filter(word => word.words.length >= this.game.minLength)
-        // const third = cut.filter(word => word.words.length >=10)
-        // this.wordsByLevel[3] = third
-        // console.log(cut)
+        const first = this.words.filter(word => word.key.length <= 10)
+        const second = this.words.filter(word => word.difficulty == 1)
+        const third = this.words.filter(word => word.difficulty == 2)
+        if (this.game.minLength !=4 ) {
+            this.wordsByLevel[1] = first
+            this.wordsByLevel[2] = [...first, second]
+            this.wordsByLevel[3] = third
+        }
+        else {
+            this.wordsByLevel[1] = first
+            this.wordsByLevel[2] = this.words
+        }
+        console.log(this.wordsByLevel[2])
     }
 
     getRandomWord(difficulty) {
-    let keys = this.words.map(word => word.key)
-    if (difficulty <= 2) {
-        keys = keys.filter(key => key.length < 10)
-    }
-    console.log(keys)
+        let keys
+        if (difficulty < 2 || this.game.minLength == 4) {
+            keys = this.wordsByLevel[1].map(word => word.key)
+        } else if (difficulty <=4 && this.game.minLength == 4){
+            keys = this.wordsByLevel[2].map(word => word.key)
+        } else {
+            keys = this.wordsByLevel[3].map(word => word.key)
+        }
+    // let keys = this.words.map(word => word.key)
     const randIndex = Math.floor(Math.random() * keys.length)
     this.word = keys[randIndex]
     this.letters = Array.from(this.word)
@@ -116,6 +122,11 @@ class WordSet {
             console.log(this.wordSet)
         }
     this.words = this.words.filter(word => word.key != this.word)
+    this.wordsByLevel[1] = this.wordsByLevel[1].filter(word => word.key !=this.word)
+    this.wordsByLevel[2] = this.wordsByLevel[2].filter(word => word.key != this.word)
+    if (this.wordsByLevel[3]) {
+        this.wordsByLevel[3] = this.wordsByLevel[3].filter(word => word.key !=this.word)
+    }
     this.sortByLength()
     this.scoreWeights()
     this.shuffle(this.letters)
@@ -203,6 +214,7 @@ class Game {
     }
     init() {
         this.wordData = new WordSet(this, this.words)
+        this.wordData.getWordsByLevel()
         if (this.diffStep == 0) {
             this.difficulty = 4
             console.log(this.difficulty)
@@ -263,11 +275,14 @@ class Game {
         if (chosen == 'both') {
             randIndex = Math.floor(Math.random()*letters.length)
             this.randIndex = randIndex
+            const letter = letters[randIndex]
             if (letters.includes('u')) {
-                randLetter = LETTERS[Math.floor(Math.random()*LETTERS.length)]
+                let clean = LETTERS.filter(char => char != letter)
+                randLetter = clean[Math.floor(Math.random()*clean.length)]
                 this.randLetter = randLetter
             } else {
-                randLetter = NO_Q[Math.floor(Math.random()*NO_Q.length)]
+                let clean = NO_Q.filter(char => char != letter)
+                randLetter = clean[Math.floor(Math.random()*clean.length)]
                 this.randLetter = randLetter
             }
             letters.push(randLetter)
@@ -360,11 +375,12 @@ class Game {
     }
     levelUp() {
         this.level += 1
-        if (!this.diffStep == 0 || this.difficulty !=4){ 
+        if (!this.diffStep == 0 && this.difficulty !=4){ 
             if (this.level % this.diffStep == 0) {
             this.difficulty +=1
             }
         }
+        console.log(this.difficulty)
         this.levelDisplay.textContent = this.level
         display.textContent = "02:00"
         levelBtn.style.display = 'none';
@@ -433,7 +449,7 @@ class Game {
             display.textContent = min + ":" + sec;
             const percentage = (timer/120) * 100;
             remaining.style.width = percentage + '%'
-            if (timer % 15 == 0 && timer!= 120) {
+            if (timer % 15 == 0 && timer!= 120 && timer != 45) {
                 this.shuffleTiles()
             }
             if (timer == 45 && (this.decoy || this.unknown)) {

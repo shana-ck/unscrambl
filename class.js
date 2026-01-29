@@ -17,6 +17,7 @@ const scorebar = document.querySelector(".scorebar")
 const debugToggle = document.getElementById("debug-toggle")
 const fakeToggle = document.getElementById("fake-toggle")
 const unknownToggle = document.getElementById("unknown-toggle")
+const infiniteToggle = document.getElementById("infinite-toggle")
 const diffStep = document.getElementById('levelDiff')
 const minLetters = document.getElementById('wordLength')
 const warning = document.getElementById('warning')
@@ -47,19 +48,22 @@ class InputHandler {
         })
         fakeToggle.addEventListener('change', (e) => {
             this.game.decoy = !this.game.decoy
-            console.log(this.game.decoy)
+            // console.log(this.game.decoy)
         })
         unknownToggle.addEventListener('change', (e) => {
             this.game.unknown = !this.game.unknown
-            console.log(this.game.unknown)
+            // console.log(this.game.unknown)
         })
         diffStep.addEventListener('change', (e) => {
             this.game.diffStep = e.target.value
-            console.log(this.game.diffStep)
+            // console.log(this.game.diffStep)
         })
         minLetters.addEventListener('change', (e) => {
             this.game.minLength = e.target.value
-            console.log(this.game.minLength)
+            // console.log(this.game.minLength)
+        })
+        infiniteToggle.addEventListener('change', (e) => {
+            this.game.noLose = !this.game.noLose
         })
         levelBtn.addEventListener('click', () => this.game.levelUp())
         debugBtn.addEventListener("click", () => this.game.debug())
@@ -95,7 +99,6 @@ class WordSet {
             this.wordsByLevel[1] = first
             this.wordsByLevel[2] = this.words
         }
-        console.log(this.wordsByLevel[2])
     }
 
     getRandomWord(difficulty) {
@@ -211,6 +214,7 @@ class Game {
         this.minLength = 5
         this.randIndex = -1
         this.randLetter = ''
+        this.noLose = false
     }
     init() {
         this.wordData = new WordSet(this, this.words)
@@ -380,7 +384,6 @@ class Game {
             this.difficulty +=1
             }
         }
-        console.log(this.difficulty)
         this.levelDisplay.textContent = this.level
         display.textContent = "02:00"
         levelBtn.style.display = 'none';
@@ -399,6 +402,7 @@ class Game {
             let scoreIdx = this.wordData.wordLengths.indexOf(key.toString())
             this.scoreVal += this.wordData.weights[scoreIdx]
             this.wordsScore.textContent = this.wordsFound.length
+            this.showToast(input)
             // if (this.debugOn) {
             //     console.log(this.wordData.weights[scoreIdx])
             // }
@@ -430,6 +434,9 @@ class Game {
         } else if (this.wordsFound.length >= Math.floor(0.75*this.wordData.wordSet.length)) {
             display.textContent = "02:00"
             levelBtn.style.display = 'inline-block'
+        } else if (this.noLose) {
+            display.textContent = "02:00"
+            levelBtn.style.display = 'inline-block'
         } else {
             this.isGameOver = true
             this.gameOver()
@@ -449,10 +456,10 @@ class Game {
             display.textContent = min + ":" + sec;
             const percentage = (timer/120) * 100;
             remaining.style.width = percentage + '%'
-            if (timer % 15 == 0 && timer!= 120 && timer != 45) {
+            if (timer % 15 == 0 && timer!= 120) {
                 this.shuffleTiles()
             }
-            if (timer == 45 && (this.decoy || this.unknown)) {
+            if (timer == 50 && (this.decoy || this.unknown)) {
                 if (!this.randLetter == '') {
                     this.tiles.at(-1).classList.add("decoy")
                 }
@@ -480,6 +487,20 @@ class Game {
              this.scoreLevel()
             }
         intervalId = null
+    }
+    showToast(foundWord) {
+        let toast = document.createElement("div")
+        toast.classList.add("toast")
+        toast.innerHTML = `<div class="toast-content-wrapper">
+        <div class="toast-message">FOUND ${foundWord.toUpperCase()}</div>
+        <div class="toast-progress"></div></div>`
+        let duration = 5000
+        toast.querySelector(".toast-progress").style.animationDuration = `${duration/1000}s`
+        let toasted = document.body.querySelector(".toast")
+        if (toasted) {
+            toasted.remove()
+        }
+        document.body.appendChild(toast)
     }
     gameOver() {
         const main = document.querySelector('.main')

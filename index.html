@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="toast-overlay" id="toast-overlay"></div>
     <div class="modal">
 <div class="modal-content"><span class="close">&times;</span>
 <div class="gameSettings">
@@ -41,12 +42,23 @@
     <span class="toggle-label">Insert Unknown Letter</span>
 </label>
 </div>
+<div>
+<label class="toggle">
+    <input class="toggle-checkbox" type="checkbox" id="infinite-toggle">
+    <div class="toggle-switch"></div>
+    <span class="toggle-label">Infinite Play Mode</span>
+</label>
 </div>
-<span><p>Default: At level 5, the game will increase in difficulty 
+</div>
+<span class="optionsInfo"><p>Default: At level 5, the game will increase in difficulty 
     and begin inserting either an unknown or decoy letter (i.e., one letter will be replaced with a ? 
     in the tiles or there will be an extra letter tile that is not actually used).</p>
     <p>At level 10, the game will increase in difficulty again and the minimum word length will be 5 letters. The decoy/unknown letters will also still be in play.</p>
     <p>At level 15, the game will increase in difficulty again and have <em>both</em> a decoy and unknown letter.</p>
+    <p>You can turn off the decoy/unknown letter options by clicking the toggles for each.</p>
+    <p>If you change the "difficulty increase increment" to 0, you will begin at max difficulty.</p>
+    <p>You can change the minimum word length at level 3 to either 4 or 5 letters long.</p>
+    <p>Toggling infinite play mode will disable the game loss condition, allowing you to play another level even if you don't reach the minimum score</p>
 </span>
 </div>
 </div>
@@ -70,20 +82,20 @@
                     <span id="countdown">02:00</span>
             </div>
         </div>
-    
+                <div id="warning"></div>
     <div class="main">   
         <div class="game-info">
-            <div id="warning"></div>
+
             <div id="timer">
             <button class="btn" id="start">Start</button>
             <button class="btn" id="stopBtn">Stop</button>
         <button class="btn2" id="level-up">Level Up</button></button></div>
-            
+            <div class="input-container">
+        <button class="btn" id="shuffle">Shuffle!</button></div>
 
         </div>
-        <div class="debug"><input type="text" id="debug"><button class="btn" id="debugBtn">Debug</button></div>
-        <div class="input-container">
-        <button class="btn" id="shuffle">Shuffle!</button></div>
+        <div class="debug"><input type="text" id="debug"><button class="btn3" id="debugBtn">Debug</button></div>
+        
         <form class="guess" id="guess">
         <input id="input" type="text" placeholder="Guess a word" value=""/>
         <button class="btn" id="guess-btn" type="submit">Guess!</button>

@@ -18,7 +18,7 @@ body {
 .modal {
   display: none; 
   position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  z-index: 10; /* Sit on top */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -72,6 +72,7 @@ body {
 .input-container {
   margin: 0.5rem;
   justify-self: center;
+  grid-area: 1/2/2/3;
 }
 
 .main {
@@ -152,6 +153,11 @@ body {
 
 .debug {
   display: none;
+}
+
+#debug {
+  width: 100px;
+  margin: 0.25rem;
 }
 
 .level {
@@ -375,6 +381,28 @@ position: absolute;
   animation: shimmer 1.5s infinite linear;
 }
 
+.btn3 {
+  font-family: 'Roboto';
+  position: relative;
+  background-color: #474f7a;
+  border-radius: 28px;
+  padding: 10px 21px;
+  border: 1px solid #708993;
+  cursor: pointer;
+  color: #ffffff;
+  overflow: hidden;
+  height: fit-content;
+}
+
+.btn3:hover {
+  background-color: #535c91;
+}
+
+.btn3:active {
+  position: relative;
+  top: 1px;
+}
+
 
 .toggle {
 	cursor: pointer;
@@ -441,4 +469,113 @@ grid-row-gap: 5px;
 
 .reveal {
   background-color: lightblue;
+}
+
+.optionsInfo {
+  font-size: small;
+}
+
+.toast {
+    position: fixed;
+    top: 125px;
+    right: 25px;
+    max-width: 300px;
+    background: lightgreen;
+    padding: 0.5rem;
+    border-radius: 4px;
+    box-shadow: -1px 1px 10px
+        rgba(0, 0, 0, 0.3);
+    z-index: 5;
+    animation: slideInRight 0.3s
+            ease-in-out forwards,
+        fadeOut 0.5s ease-in-out
+            forwards 3s;
+    transform: translateX(110%);
+}
+
+.toast.closing {
+    animation: slideOutRight 0.5s
+        ease-in-out forwards;
+}
+
+.toast-progress {
+    position: absolute;
+    display: block;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background: green;
+    animation: toastProgress 3s
+        ease-in-out forwards;
+}
+
+.toast-content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toast-icon {
+    padding: 0.35rem 0.5rem;
+    font-size: 1.5rem;
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #000000;
+    padding: 0.5rem;
+}
+
+@keyframes slideInRight {
+    0% {
+        transform: translateX(110%);
+    }
+
+    75% {
+        transform: translateX(-10%);
+    }
+
+    100% {
+        transform: translateX(0%);
+    }
+}
+
+@keyframes slideOutRight {
+    0% {
+        transform: translateX(0%);
+    }
+
+    25% {
+        transform: translateX(-10%);
+    }
+
+    100% {
+        transform: translateX(110%);
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes toastProgress {
+    0% {
+        width: 100%;
+    }
+
+    100% {
+        width: 0%;
+    }
+}
+
+#warning {
+  text-align: center;
 }

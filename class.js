@@ -23,6 +23,12 @@ const minLetters = document.getElementById('wordLength')
 const warning = document.getElementById('warning')
 const LETTERS = 'abcdefghijklmnopqrstuvwxyz'.split('')
 const NO_Q = 'abcdefghijklmnoprstuvwxyz'.split('')
+let screenWidth = window.innerWidth;
+
+const setStorage = (item, val) => {
+    localStorage.setItem(item, val);
+}
+
 let count = 0
 
 let intervalId
@@ -48,26 +54,62 @@ class InputHandler {
         })
         fakeToggle.addEventListener('change', (e) => {
             this.game.decoy = !this.game.decoy
-            // console.log(this.game.decoy)
+            if (typeof(Storage) !== "undefined") {
+                setStorage("decoy", this.game.decoy);
+            }
         })
         unknownToggle.addEventListener('change', (e) => {
             this.game.unknown = !this.game.unknown
-            // console.log(this.game.unknown)
+            if (typeof(Storage) !== "undefined") {
+                setStorage("unknown", this.game.unknown);
+            }
         })
         diffStep.addEventListener('change', (e) => {
             this.game.diffStep = e.target.value
-            // console.log(this.game.diffStep)
+            if (typeof(Storage) !== "undefined") {
+                setStorage("diffStep", this.game.diffStep);
+            }
         })
         minLetters.addEventListener('change', (e) => {
             this.game.minLength = e.target.value
-            // console.log(this.game.minLength)
+            if (typeof(Storage) !== "undefined") {
+                setStorage("minLength", this.game.minLength);
+            }
         })
         infiniteToggle.addEventListener('change', (e) => {
             this.game.noLose = !this.game.noLose
         })
+
         levelBtn.addEventListener('click', () => this.game.levelUp())
         debugBtn.addEventListener("click", () => this.game.debug())
         stopBtn.addEventListener("click", () => this.game.stopTimer())
+        window.addEventListener('resize', () => {window.innerWidth > 768 ? this.game.pixels = 80 : this.game.pixels = 40;
+            this.game.updateTileContainer(this.game.curWord.length)
+        });
+        if (typeof(Storage) !== "undefined") {
+            this.getStorage("decoy", "decoy");
+            this.getStorage("unknown", "unknown");
+            this.getStorage("diffStep", "diffStep");
+            this.getStorage("minLength", "minLength");
+        }
+    }
+    getStorage(item, method) {
+        if (localStorage.getItem(item) !== null){
+            if (method == "decoy") {
+                this.game.decoy = localStorage.getItem(item)
+                console.log(this.game.decoy)
+                fakeToggle.checked = this.game.decoy === 'true' ? true : false
+            } else if (method == "unknown") {
+                this.game.unknown = localStorage.getItem(item)
+                unknownToggle.checked = this.game.unknown === 'true' ? true : false
+            } else if (method == "diffStep") {
+                this.game.diffStep = localStorage.getItem(item)
+                diffStep.value = this.game.diffStep
+            } else if (method == "minLength") {
+                this.game.minLength = localStorage.getItem(item)
+                minLetters.value = this.game.minLength
+            }  
+        }
     }
 }
 
@@ -215,6 +257,18 @@ class Game {
         this.randIndex = -1
         this.randLetter = ''
         this.noLose = false
+        this.pixels = screenWidth > 768 ? 80 : 40;
+        if (typeof(Storage) !== "undefined") {
+            this.getSettings()
+        }
+    }
+    getSettings() {
+        const settings = ["decoy", "unknown", "diffStep", "minLength"]
+        settings.forEach(item => {
+             this.inputHandler.getStorage(item, item);
+        })
+        settings.some(item => localStorage.getItem(item) !== null) ? this.showToast('existing settings loaded') : null
+
     }
     init() {
         this.wordData = new WordSet(this, this.words)
@@ -275,7 +329,6 @@ class Game {
         } else if (this.difficulty == 4 && this.unknown) {
             chosen = confuse[1]
         }
-        this.container.style.width = 80*numTiles + 'px'
         if (chosen == 'both') {
             randIndex = Math.floor(Math.random()*letters.length)
             this.randIndex = randIndex
@@ -318,13 +371,26 @@ class Game {
                     newTile.textContent = '?'
                 }
             }
-            const xPos = i * 80
+            const xPos = i * this.pixels
             newTile.style.transform = `translate(${xPos}px)`
             newTile.dataset.xPos = xPos
             this.tiles.push(newTile)
         }
         this.tiles.forEach(tile => {
             this.container.appendChild(tile)
+        })
+        this.updateTileContainer(numTiles)
+    }
+    updateTileContainer(numTiles) {
+        numTiles * 80 > window.innerWidth ? this.pixels = 40 : this.pixels = 80;
+        this.container.style.width = this.pixels*this.tiles.length + 'px'
+        this.container.style.height = this.pixels + 'px'
+        this.tiles.forEach((tile, index) => {
+            tile.style.width = this.pixels + 'px'
+            tile.style.height = this.pixels + 'px'
+            const xPos = index * this.pixels
+            tile.style.transform = `translate(${xPos}px)`
+            tile.dataset.xPos = xPos
         })
     }
     createBlanks() {

@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css"/>
 </head>
 <body>
     <div class="toast-overlay" id="toast-overlay"></div>
@@ -63,7 +64,16 @@
 </div>
 </div>
 <div class="nav">
+
     <ul class="options">
+            <div class="theme-switch-wrapper">
+                <input class="toggle-theme" type="checkbox" id="theme">
+            <label class="slider-label" for="theme">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                <span class="ball"></span>
+            </label>
+            </div>
         <li id="openModal">Options</li>
         <li class="label"><span>Level: <span id="level">1</span></li>
         <div id="level-score">

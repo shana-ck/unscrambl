@@ -565,6 +565,7 @@ input[type="number"] {
 
 .decoy {
   background-color: #fa6964;
+  color: lightpink;
 }
 
 .reveal {
@@ -736,4 +737,8 @@ input[type="number"] {
 .toggle-theme:checked + .slider-label {
   background-color: navy;
   transition: background-color 500ms linear;
+}
+
+#modalHeader {
+  font-weight: bold;
 }

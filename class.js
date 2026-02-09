@@ -24,6 +24,7 @@ const warning = document.getElementById('warning')
 const LETTERS = 'abcdefghijklmnopqrstuvwxyz'.split('')
 const NO_Q = 'abcdefghijklmnoprstuvwxyz'.split('')
 let screenWidth = window.innerWidth;
+const settings = ["decoy", "unknown", "diffStep", "minLength"]
 
 const setStorage = (item, val) => {
     localStorage.setItem(item, val);
@@ -36,6 +37,7 @@ let intervalId
 class InputHandler {
     constructor(game) {
         this.game = game
+
         shufButton.addEventListener('click', () => this.game.shuffleTiles())
         form.addEventListener('submit', (e) => {
             e.preventDefault()
@@ -87,17 +89,16 @@ class InputHandler {
             this.game.updateTileContainer(this.game.curWord.length)
         });
         if (typeof(Storage) !== "undefined") {
-            this.getStorage("decoy", "decoy");
-            this.getStorage("unknown", "unknown");
-            this.getStorage("diffStep", "diffStep");
-            this.getStorage("minLength", "minLength");
+            settings.forEach(item => {
+             this.getStorage(item, item);
+        })
+            settings.some(item => localStorage.getItem(item) !== null) ? this.game.showToast('existing settings loaded') : this.game.showToast('no existing settings; click options to customize')
         }
     }
     getStorage(item, method) {
         if (localStorage.getItem(item) !== null){
             if (method == "decoy") {
                 this.game.decoy = localStorage.getItem(item)
-                console.log(this.game.decoy)
                 fakeToggle.checked = this.game.decoy === 'true' ? true : false
             } else if (method == "unknown") {
                 this.game.unknown = localStorage.getItem(item)
@@ -110,6 +111,7 @@ class InputHandler {
                 minLetters.value = this.game.minLength
             }  
         }
+        
     }
 }
 
@@ -253,22 +255,27 @@ class Game {
         this.decoy = true
         this.unknown = true
         this.diffStep = 5
-        this.minLength = 5
+        this.minLength = 4
         this.randIndex = -1
         this.randLetter = ''
         this.noLose = false
         this.pixels = screenWidth > 768 ? 80 : 40;
-        if (typeof(Storage) !== "undefined") {
-            this.getSettings()
-        }
+        this.getSettings()
     }
     getSettings() {
         const settings = ["decoy", "unknown", "diffStep", "minLength"]
+        settings.forEach(item => { this.inputHandler.getStorage(item, item)})
         settings.forEach(item => {
-             this.inputHandler.getStorage(item, item);
+            if (item == "decoy") {
+                setStorage("decoy", this.decoy);
+            } else if (item == "unknown") {
+                setStorage("unknown", this.unknown);
+            } else if (item == "diffStep") {
+                setStorage("diffStep", this.diffStep);
+            } else if (item == "minLength") {
+                setStorage("minLength", this.minLength);
+            }
         })
-        settings.some(item => localStorage.getItem(item) !== null) ? this.showToast('existing settings loaded') : null
-
     }
     init() {
         this.wordData = new WordSet(this, this.words)
@@ -468,7 +475,7 @@ class Game {
             let scoreIdx = this.wordData.wordLengths.indexOf(key.toString())
             this.scoreVal += this.wordData.weights[scoreIdx]
             this.wordsScore.textContent = this.wordsFound.length
-            this.showToast(input)
+            this.showToast(`Found ${input}`)
             // if (this.debugOn) {
             //     console.log(this.wordData.weights[scoreIdx])
             // }
@@ -558,7 +565,7 @@ class Game {
         let toast = document.createElement("div")
         toast.classList.add("toast")
         toast.innerHTML = `<div class="toast-content-wrapper">
-        <div class="toast-message">FOUND ${foundWord.toUpperCase()}</div>
+        <div class="toast-message">${foundWord.toUpperCase()}</div>
         <div class="toast-progress"></div></div>`
         let duration = 5000
         toast.querySelector(".toast-progress").style.animationDuration = `${duration/1000}s`

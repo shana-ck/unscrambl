@@ -742,3 +742,25 @@ input[type="number"] {
 #modalHeader {
   font-weight: bold;
 }
+
+.footer {
+  background-color: var(--background);
+  opacity: 0.75;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  color: var(--on-background);
+  font-size: small;
+  text-align: center;
+  padding: 0.2rem;
+}
+
+.footer a {
+  color: var(--tertiary-color);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+  color: var(--primary-color)
+}

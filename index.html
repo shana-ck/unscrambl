@@ -24,7 +24,7 @@
 </label>
 <div>
 <label for="wordLength">Minimum Word Length at Difficulty 3: </label>
-<input type="number" id="wordLength" step="1" min="4" max="5" value="5">
+<input type="number" id="wordLength" step="1" min="4" max="5" value="4">
 </div>
 <div>
 <label class="toggle">
@@ -51,16 +51,24 @@
     <span class="toggle-label">Infinite Play Mode</span>
 </label>
 </div>
+<div>
+<label class="toggle">
+    <input class="toggle-checkbox" type="checkbox" id="scoreType">
+    <div class="toggle-switch"></div>
+    <span class="toggle-label">Alternate Scoring</span>
+</label>
+</div>
 </div>
 <ul class="optionsInfo"><li>Default: At level 5, the game will increase in difficulty 
     and begin inserting either an unknown or decoy letter (i.e., one letter will be replaced with a ? 
-    in the tiles or there will be an extra letter tile that is not actually used).</p>
-    <li>At level 10, the game will increase in difficulty again and the minimum word length will be 5 letters. The decoy/unknown letters will also still be in play.</p>
-    <li>At level 15, the game will increase in difficulty again and have <em>both</em> a decoy and unknown letter.</p>
-    <li>You can turn off the decoy/unknown letter options by clicking the toggles for each.</p>
-    <li>If you change the "difficulty increase increment" to 0, you will begin at max difficulty.</p>
-    <li>You can change the minimum word length at level 3 to either 4 or 5 letters long.</p>
-    <li>Toggling infinite play mode will disable the game loss condition, allowing you to play another level even if you don't reach the minimum score</p>
+    in the tiles or there will be an extra letter tile that is not actually used).</li>
+    <li>At level 10, the game will increase in difficulty again and the minimum word length will be 5 letters. The decoy/unknown letters will also still be in play.</l>
+    <li>At level 15, the game will increase in difficulty again and have <em>both</em> a decoy and unknown letter.</li>
+    <li>You can turn off the decoy/unknown letter options by clicking the toggles for each.</li>
+    <li>If you change the "difficulty increase increment" to 0, you will begin at max difficulty.</li>
+    <li>You can change the minimum word length at level 3 to either 4 or 5 letters long.</li>
+    <li>Toggling infinite play mode will disable the game loss condition, allowing you to play another level even if you don't reach the minimum score</li>
+    <li>Default scoring assigns 1 point per letter in a word plus 10 points for finding the longest word. Alternate scoring uses an obscure formula to score each word plus ten points for finding the longest word.</li>
 </span>
 </div>
 </div>

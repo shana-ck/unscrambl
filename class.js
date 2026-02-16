@@ -20,11 +20,12 @@ const unknownToggle = document.getElementById("unknown-toggle")
 const infiniteToggle = document.getElementById("infinite-toggle")
 const diffStep = document.getElementById('levelDiff')
 const minLetters = document.getElementById('wordLength')
+const scoreType = document.getElementById('scoreType')
 const warning = document.getElementById('warning')
 const LETTERS = 'abcdefghijklmnopqrstuvwxyz'.split('')
 const NO_Q = 'abcdefghijklmnoprstuvwxyz'.split('')
 let screenWidth = window.innerWidth;
-const settings = ["decoy", "unknown", "diffStep", "minLength"]
+const settings = ["decoy", "unknown", "diffStep", "minLength", "scoreType"]
 
 const setStorage = (item, val) => {
     localStorage.setItem(item, val);
@@ -81,6 +82,12 @@ class InputHandler {
         infiniteToggle.addEventListener('change', (e) => {
             this.game.noLose = !this.game.noLose
         })
+        scoreType.addEventListener('change', (e) => {
+            this.game.altScore = e.target.checked
+            if (typeof(Storage) !== "undefined") {
+                setStorage("scoreType", this.game.altScore);
+            }
+        })
 
         levelBtn.addEventListener('click', () => this.game.levelUp())
         debugBtn.addEventListener("click", () => this.game.debug())
@@ -109,7 +116,10 @@ class InputHandler {
             } else if (method == "minLength") {
                 this.game.minLength = localStorage.getItem(item)
                 minLetters.value = this.game.minLength
-            }  
+            } else if (method == "scoreType") {
+                this.game.altScore = localStorage.getItem(item)
+                scoreType.checked = this.game.altScore === 'true' ? true : false
+            }
         }
         
     }
@@ -200,13 +210,20 @@ class WordSet {
     }
     scoreWeights() {
         let count = this.wordLengths.length
+        if (!this.game.altScore) {
+            this.weights = this.wordLengths
+        }
+        else {
         this.weights = this.wordLengths.map((index) => {
+            console.log(index, count)
             let weight = Math.abs(Math.floor(this.maxWeight*(1-index/count)))
             if (weight < 1) {
                 weight = 1
             }
             return weight
         })
+    }
+
     }
     shuffle(letters) {
         this.letters = letters
@@ -260,6 +277,8 @@ class Game {
         this.randLetter = ''
         this.noLose = false
         this.pixels = screenWidth > 768 ? 80 : 40;
+        this.altScore = false
+        this.weighting = this.altScore ? 0.6 : 0.7
         this.getSettings()
     }
     getSettings() {
@@ -302,10 +321,10 @@ class Game {
         let wordLen = this.wordData.wordLengths
         wordLen.forEach(key => {
             let numWords = this.wordData.sorted[key].length
-            let weightIdx = wordLen.indexOf(key.toString())
-            this.maxScore += scoreArray[weightIdx] * numWords
+            let weightIdx = wordLen.indexOf(key)
+            this.maxScore += parseInt(scoreArray[weightIdx]) * numWords
         })
-        threshold.textContent = '/' + Math.floor(0.6*this.maxScore)
+        threshold.textContent = '/' + Math.floor(this.weighting*this.maxScore)
         wordsThreshold.textContent = '/' + Math.floor(0.75*this.wordData.wordSet.length)
         
     }
@@ -473,13 +492,13 @@ class Game {
             this.wordsFound.push(input)
             this.found[key].push(input)
             let scoreIdx = this.wordData.wordLengths.indexOf(key.toString())
-            this.scoreVal += this.wordData.weights[scoreIdx]
+            this.scoreVal += parseInt(this.wordData.weights[scoreIdx])
             this.wordsScore.textContent = this.wordsFound.length
             this.showToast(`Found ${input}`)
             // if (this.debugOn) {
             //     console.log(this.wordData.weights[scoreIdx])
             // }
-            if (this.scoreVal >= Math.floor(0.6*this.maxScore) || this.wordsFound.length >= Math.floor(0.75*this.wordData.wordSet.length)) {
+            if (this.scoreVal >= Math.floor(this.weighting*this.maxScore) || this.wordsFound.length >= Math.floor(0.75*this.wordData.wordSet.length)) {
                 scorebar.classList.add('shimmer')
                 scoreInfo.classList.add('up')
             }
@@ -499,7 +518,7 @@ class Game {
         }
     }
     scoreLevel() {
-        if (this.scoreVal >= Math.floor(0.6*this.maxScore)) {
+        if (this.scoreVal >= Math.floor(this.weighting*this.maxScore)) {
             display.textContent = "02:00"
             levelBtn.style.display = 'inline-block'
             // start.disabled = false
